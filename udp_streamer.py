@@ -40,11 +40,15 @@ class udp_handler(object):
 			self.pklist.append(pkid)
 			if len(self.pklist)>self.PKLEN:
 				self.packets.pop(self.pklist.pop(0))
-		data=None
 		if rembytes<=0:
 			data=self.packets[pkid]
 			self.packets.pop(pkid)
 			self.pklist.remove(pkid)
+		else:
+			try:
+				data=self.get_data()
+			except RecursionError:
+				data=None
 		return data
 
 	def send_data_small(self,img,ip,port):
