@@ -5,7 +5,21 @@ import dlib
 import cv2
 from imutils import face_utils
 
+from udp_streamer import *
 
+handler = udp_handler()
+handler.make_listener('0.0.0.0',5554)
+
+def get_img():
+    global handler,img
+    buffer = handler.get_data()
+    if buffer is not None:
+        try:
+            npimg = np.frombuffer(buffer, dtype=np.uint8)
+            img = cv2.imdecode(npimg, 1)
+        except Exception as e:
+            print(e)
+    return img
 
 #Copy this fuction....it returns the acpect ration
 def eye_aspect_ratio(eye):
@@ -37,6 +51,7 @@ flag = 0
 while True:
     #Record the video...
     _, frame = cam.read()
+    # frame=get_img()
     
     #Now, the usual stuff
     frame = cv2.flip(frame, 1)
@@ -73,14 +88,14 @@ while True:
             if flag > frames_pass:
                 #Alert the user if he is sleepy....
                 
-                cv2.putText(frame, "********ALERT*********",
-                           (10, 30), cv2.FONT_HERSHEY_COMPLEX, 0.7, (0, 0, 255), 2)
-                cv2.putText(frame, "YOU ARE DROWSY",
+                # cv2.putText(frame, "********ALERT*********",
+                           # (10, 30), cv2.FONT_HERSHEY_COMPLEX, 0.7, (0, 0, 255), 2)
+                cv2.putText(frame, "DROWSY",
                            (10, 324), cv2.FONT_HERSHEY_COMPLEX, 0.7, (0, 0, 255), 2)
         
-            else:
-                cv2.putText(frame, "AWAKE!!!",
-                           (10, 324), cv2.FONT_HERSHEY_COMPLEX, 0.7, (0, 0, 255), 2)
+            # else:
+            #     cv2.putText(frame, "AWAKE",
+            #                (10, 324), cv2.FONT_HERSHEY_COMPLEX, 0.7, (0, 255, 0), 2)
 
         
         else:
